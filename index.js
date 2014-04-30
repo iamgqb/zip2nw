@@ -7,7 +7,7 @@ var zip = new JSZip();
 var wtd = function(){
     //write to disk
     var file = zip.generate({type:'nodebuffer'});
-    fs.writeFile('app.nw', file, function(err){
+    fs.writeFile(G.fileName, file, function(err){
         if (err)
             throw err;
     }); 
@@ -85,7 +85,8 @@ var main = function(){
 var args = process.argv.slice(2);
 var G = {
     cmd: args[0],
-    path: args[1] || '.',
+    fileName: args[1] || 'app.nw'
+    path: args[2] || '.',
     length: 0
 };
 switch (G.cmd){
