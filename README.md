@@ -1,6 +1,8 @@
 为了方便打包node-webkit 为.nw 文件
 
-----usage----
+----
+usage
+----
 可以直接 node zip
 
 如果执行了全局安装
