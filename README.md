@@ -1,0 +1,1 @@
+为了方便打包node-webkit 为.nw 文件
