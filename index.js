@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var JSZip = require('jszip');
 var fs = require('fs');
 var zip = new JSZip();
@@ -13,7 +15,7 @@ var wtd = function(){
 
 
 var getName = function(dir){
-    return dir.replace(/\.\//, '');
+    return dir.replace(G.path+'/', '');
 }
 
 var getFile = function(dir){
@@ -26,6 +28,7 @@ var getFile = function(dir){
 }
 
 var getDir = function(path){
+    console.log(getName(path))
     fs.readdir(path, function(err, files){
         if (err) throw err;
 
@@ -36,17 +39,12 @@ var getDir = function(path){
 
 var addFile = function(fileName, data){
     zip.file(fileName, data);
-    wtd();
-    if (--G.length === 0){
-        wtd();
-    }
+    --G.length === 0 && wtd();
 }
 
 var addDirectory = function(folderName){
     zip.folder(folderName);
-    if (--G.length === 0){
-        wtd();
-    }
+    --G.length === 0 && wtd();
 }
 
 var fileLoop = function(files, path){
@@ -56,35 +54,45 @@ var fileLoop = function(files, path){
             if (err) throw err;
 
             if (stats.isFile()) {
-                // console.log(stats)
                 getFile(dir);
             }
             else if (stats.isDirectory()){
-                addDirectory(dir);
+                addDirectory(getName(dir));
                 getDir(dir)
             }
         });
     });    
 }
 
-var G = {};
-var cwd = process.cwd();
+
 var main = function(){
-    fs.readdir('.', function(err, files){
+    var path = G.path;
+
+    fs.lstat(path, function(err, stats){
         if (err) throw err;
-        G.length = files.length;
-        fileLoop(files, '.');
+
+        if (stats.isFile()) {
+            G.length = 1;
+            getFile(path);
+        }
+        else if (stats.isDirectory()){
+            getDir(path)
+        }
     });
 };
 
 
 var args = process.argv.slice(2);
-var cmd = args[0];
-switch (cmd){
+var G = {
+    cmd: args[0],
+    path: args[1] || '.',
+    length: 0
+};
+switch (G.cmd){
     case 'zip':
         main();break;
     default :
-        console.log('\tzip2nw zip');
+        console.log('\n\tzip2nw zip');
 }
 
 module.exports = main;
